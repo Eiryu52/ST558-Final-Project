@@ -7,6 +7,8 @@ Heart_Data <- read.csv("heart_2022_no_nans.csv", sep = ',')
 Heart_Data_Reduced <- head(Heart_Data, 20000)
 function(input, output, session) {
 
+
+  
   
   output$output_plot <- renderPlot({
     if (input$plot == 'Scatterplot') {

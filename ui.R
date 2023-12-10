@@ -11,7 +11,34 @@ library(shiny)
 
 fluidPage(
   
-  sidebarLayout(
+  titlePanel("Heart Disease Shiny App Final Project"),
+  
+  tabsetPanel(
+    tabPanel("About", fluid = TRUE,
+    mainPanel(
+      h4("Information about Heart Disease Dataset"),
+      p("The purpose of this app is to do Data Exploration for the Heart Disease dataset looking at different categorical variables
+        and different numerical variables. The other purpose of this app is to do Data Modeling to predict Heart Disease based on
+        predictors within the dataset. This app is created for the Final Project for ST 558 at NCSU."),
+      
+      p("The source of the data comes from Kaggle, it has two different datasets corresponding to 2020 and 2022. I have chosen to 
+        use the 2022 dataset. The 2022 dataset comes in the form of a csv file where all dataset is cleaned to have no missing values.
+        There are a total of 246022 observations and 40 different variables, for the purposes of this app, only 20000 observations are used for Data
+        Exploration and Modeling due to time constraints when Data Exploration and Data Modeling occurs. The link to the dataset can
+        be found here"),
+      
+      
+      p("About Tab - Gives general information about this Shiny App"),
+      p("Data Exploration Tab - Allows you to select a specific plot and based on the plot, choose different variables to summarize. Additionally,
+        allows you to look at numeric summaries of numerical variables based on levels of a chosen categorical variable."),
+      p("Modeling Tab - Has three different subtabs which are Modeling Info, Model Fitting, and Prediction Tabs. Modeling Info Tab contains 
+        information about the two different modeling approaches for this dataset. Model Fitting allows you to choose different model parameters
+        and variables to fit for model. Prediction allows you to choose values of specific variables to make a prediction using both models.")
+    )
+    ),
+    
+    tabPanel("Data Exploration", fluid = TRUE, 
+    sidebarLayout(
     sidebarPanel(
       
       
@@ -60,4 +87,7 @@ fluidPage(
       tableOutput("summaryTable")
     )
   )
-)
+),
+    tabPanel("Devarakonda")
+
+))
