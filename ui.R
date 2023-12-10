@@ -88,6 +88,8 @@ fluidPage(
     )
   )
 ),
-    tabPanel("Devarakonda")
+    tabPanel("Modeling", tabsetPanel(tabPanel("Modeling Info"),
+                                     tabPanel("Model Fitting"),
+                                     tabPanel("Prediction"))))
 
-))
+)
