@@ -88,8 +88,51 @@ fluidPage(
     )
   )
 ),
-    tabPanel("Modeling", tabsetPanel(tabPanel("Modeling Info"),
-                                     tabPanel("Model Fitting"),
-                                     tabPanel("Prediction"))))
+    tabPanel("Modeling", tabsetPanel(tabPanel("Modeling Info",
+                                              
+                                              
+                                              
+                                              
+                                              
+                                              
+                                              ),
+                                     tabPanel("Model Fitting",
+                                              sidebarLayout(
+                                                sidebarPanel(
+                                                  
+                                                sliderInput("split", "Select train percentage", value = 70, min = 50, max = 90),
+                                                selectizeInput("predictors", "Select predictors you want to use", c("BMI", "WeightInKilograms", "HeightInMeters", "HadStroke", "HadAngina", 
+                                                                                                                          "SmokerStatus", "Sex", "PhysicalHealthDays", "MentalHealthDays", "SleepHours"), multiple = TRUE),
+                                                selectInput("tuning", "Select value of tuning for mtry", c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)),
+                                                selectInput("validation", "Select number of times to cross-validate", c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)),
+                                                  
+                                                actionButton("fit_models", "Fit Models")
+                                                  
+                                                  
+                                                  
+                                                  
+                                                  
+                                                ),
+                                              
+                                              
+                                          mainPanel(
+                                            verbatimTextOutput("logistic_confusion_matrix"),
+                                            verbatimTextOutput("randomforest_confusion_matrix")
+                                          )    
+                                              )  
+                                              
+                                              
+                                              
+                                              
+                                              ),
+                                     tabPanel("Prediction",
+                                              
+                                              
+                                              
+                                              
+                                              
+                                              
+                                              
+                                              ))))
 
 )
