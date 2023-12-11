@@ -1,5 +1,6 @@
 library(caret)
 library(tidyverse)
+library(randomForest)
 library(shiny)
 
 
@@ -14,22 +15,23 @@ function(input, output, session) {
     if (input$plot == 'Scatterplot') {
  
       ggplot(Heart_Data_Reduced , aes_string(x = input$scatter_x_var, y = input$scatter_y_var)) +
-        geom_point(aes_string(col = input$scatter_cat_var))
+        geom_point(aes_string(col = input$scatter_cat_var)) + ggtitle("Scatterplot between two Numerical Variables")
       
     } else if (input$plot == 'Histogram') {
    
       ggplot(Heart_Data_Reduced , aes_string(x = input$hist_variable)) +
-        geom_histogram()
+        geom_histogram() + ggtitle("Histogram to show distribution of Numerical Variables")
       
     } else if (input$plot == 'Box Plot') {
       
       ggplot(Heart_Data_Reduced , aes_string(x = input$box_cat_var, y = input$box_num_var)) +
-        geom_boxplot()
+        geom_boxplot() + ggtitle("Boxplots for different Numerical Variables")
       
     } else if (input$plot == 'Bar Plot') {
       
       
-      ggplot(Heart_Data_Reduced, aes_string(x = input$bar_cat_var, fill = input$bar_cat_var_2)) + geom_bar(position = "dodge")
+      ggplot(Heart_Data_Reduced, aes_string(x = input$bar_cat_var, fill = input$bar_cat_var_2)) + geom_bar(position = "dodge") +
+        ggtitle("Bar Plot for Categorical Variables")
       
     }
     
@@ -37,15 +39,16 @@ function(input, output, session) {
   })
   
     output$summaryTable <- renderTable({
-      Heart_Data_Reduced %>% select(input$variable_2, input$variable_1) %>% group_by(!!sym(input$variable_2)) %>% summarize(mean = mean(!!sym(input$variable_1)), 
-                                                                                          median = median(!!sym(input$variable_1)), min = min(!!sym(input$variable_1)), 
-                                                                                          max = max(!!sym(input$variable_1)), count = n())
+      Heart_Data_Reduced %>% select(input$variable_2, input$variable_1) %>% 
+        group_by(!!sym(input$variable_2)) %>% 
+        summarize(mean = mean(!!sym(input$variable_1)), median = median(!!sym(input$variable_1)), min = min(!!sym(input$variable_1)), 
+                   max = max(!!sym(input$variable_1)), count = n())
       
 
     })
    
-  logistic_model <- reactiveVal(NULL)  
-  random_forest_model <- reactiveVal(NULL)
+    logistic_model <- reactiveVal(NULL)  
+    random_forest_model <- reactiveVal(NULL)
     
   
     observeEvent(input$fit_models, {
@@ -72,6 +75,11 @@ function(input, output, session) {
       logistic_test_cm <- confusionMatrix(as.factor(predict(logistic_model(), newdata = test_heart)), as.factor(test_heart$HadHeartAttack))
       
       randomforest_test_cm <- confusionMatrix(as.factor(predict(random_forest_model(), newdata = test_heart)), as.factor(test_heart$HadHeartAttack))
+      
+      output$summaryLogistic <- renderPrint({summary(logistic_model())})
+      
+      output$variableimportanceRF <- renderPrint({varImp(random_forest_model())})
+      output$variableimportanceplotRF <- renderPlot({varImpPlot(random_forest_model()$finalModel, main = "Variance Importance Plot for Heart Disease")})
       
       output$logistic_confusion_matrix <- renderPrint({logistic_test_cm})
       output$randomforest_confusion_matrix <- renderPrint({randomforest_test_cm})

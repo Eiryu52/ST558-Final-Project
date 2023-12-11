@@ -54,7 +54,7 @@ fluidPage(
     sidebarPanel(
       
       
-      h4("Choose a type of plot to look at"),
+      h3("Choose a type of plot to visualize"),
       
       # Allowing to choose type of plot
       radioButtons("plot", "Select Plot Type", c("Scatterplot", "Histogram", "Box Plot", "Bar Plot")),
@@ -92,7 +92,7 @@ fluidPage(
       ),
       
       
-      h4("For numerical summaries of different variables"),
+      h3("Numerical Summaries"),
       
       # Inputs to choose numeric variable and categorical variable to summarize by
       selectInput("variable_1", "Select Numeric Variable to Summarize", c("BMI", "WeightInKilograms", "HeightInMeters", "PhysicalHealthDays", "MentalHealthDays", "SleepHours")),
@@ -103,7 +103,12 @@ fluidPage(
       
     ),
     mainPanel(
+      
+      # Outputting specific plots
       plotOutput("output_plot"),
+      
+      # Outputting numerical summaries
+      h4("Summaries for Numerical Variables by level of chosen Categorical Variable"),
       tableOutput("summaryTable")
     )
   )
@@ -146,12 +151,32 @@ fluidPage(
                     selectizeInput("predictors", "Select predictors you want to use", c("BMI", "WeightInKilograms", "HeightInMeters", "HadStroke", "HadAngina", 
                                                                                       "AlcoholDrinkers" ,"Sex", "PhysicalHealthDays", "MentalHealthDays", "SleepHours"), 
                                                                                        multiple = TRUE),
-                    selectInput("tuning", "Select value of tuning for mtry", c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)),
-                    selectInput("validation", "Select number of times to cross-validate", c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)),
+                    selectInput("tuning", "Select value of tuning for mtry, cannot be greater than selected # of predictors (Random Forest)", c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)),
+                    selectInput("validation", "Select number of folds for cross-validation (Both Models)", c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)),
                      actionButton("fit_models", "Fit Models")
                                ),
                   mainPanel(
+                    
+                    # Summary for Logistic Model
+                    h4("Summary for Logistic Model on Train Set"),
+                    verbatimTextOutput("summaryLogistic"),
+                    
+                    # Variable Importance Table for Random Forest
+                    h4("Variable Importance Table for Random Forest on Train Set"),
+                    p("The higher the number, the more important the variable is in contributing to predicting Heart Disease"),
+                    verbatimTextOutput("variableimportanceRF"),
+                    
+                    # Variable Importance Plot for Random Forest
+                    h4("Visualizing Variable Importance for Random Forest on Train Set"),
+                    p("The higher the Mean Decrease in Gini, the more important the variable is in contributing to predicting Heart Disease"),
+                    plotOutput("variableimportanceplotRF"),
+                    
+                    # Confusion Matrix for Logistic Model
+                    h4("Confusion Matrix for Logistic Model on Test Set"),
                     verbatimTextOutput("logistic_confusion_matrix"),
+                    
+                    # Confusion Matrix for Random Forest Model
+                    h4("Confusion Matrix for Random Forest Model on Test Set"),
                     verbatimTextOutput("randomforest_confusion_matrix")
                                                                        )    
                                                                         )  
@@ -177,7 +202,11 @@ fluidPage(
                                                                            ),
                           # Outputting results for predicted values of chosen variables.
                           mainPanel(
+                            
+                                  h4("Prediction of Heart Disease for Logistic Model"),
                                   verbatimTextOutput("prediction_logistic_model"),
+                                  
+                                  h4("Prediction of Heart Disease for Random Forest Model"),
                                   verbatimTextOutput("prediction_random_forest_model")
                                                                                     )
                                                 
