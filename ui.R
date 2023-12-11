@@ -102,7 +102,7 @@ fluidPage(
                                                   
                                                 sliderInput("split", "Select train percentage", value = 70, min = 50, max = 90),
                                                 selectizeInput("predictors", "Select predictors you want to use", c("BMI", "WeightInKilograms", "HeightInMeters", "HadStroke", "HadAngina", 
-                                                                                                                          "SmokerStatus", "Sex", "PhysicalHealthDays", "MentalHealthDays", "SleepHours"), multiple = TRUE),
+                                                                                                                        "AlcoholDrinkers" ,"Sex", "PhysicalHealthDays", "MentalHealthDays", "SleepHours"), multiple = TRUE),
                                                 selectInput("tuning", "Select value of tuning for mtry", c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)),
                                                 selectInput("validation", "Select number of times to cross-validate", c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)),
                                                   
@@ -126,13 +126,34 @@ fluidPage(
                                               
                                               ),
                                      tabPanel("Prediction",
+                                              sidebarLayout(
+                                                
+                                                sidebarPanel(
+                                                  sliderInput("bmi_value", "BMI", value = 10, min = 1, max = 100),
+                                                  sliderInput("weight_value", "Weight In Kilograms", value = 10, min = 1, max = 500),
+                                                  sliderInput("height_value", "Height in Meters", value = 0.1, min = 0.1, max = 5),
+                                                  radioButtons("stroke_value", "Had a Stroke", c("Yes", "No"), selected = "No"),
+                                                  radioButtons("angina_value", "Has Angina", c("Yes", "No"), selected = "No"),
+                                                  radioButtons("alcohol_value", "Drink Alcohol?", c("Yes", "No"), selected = "No"),
+                                                  selectInput("sex_value", "Sex of Individual", c("Male", "Female"), selected = "Female"),
+                                                  sliderInput("physicalhealthdays_value", "Physical Health Days", value = 10, min = 1, max = 100),
+                                                  sliderInput("mentalhealthdays_value", "Mental Health Days", value = 10, min = 1, max = 100),
+                                                  sliderInput("sleephour_value", "Number of Hours of Sleep", value = 1, min = 1, max = 20),
+                                                  actionButton("predict_results", "Predict Heart Disease")
+                                                ),
+                                                
+                                                mainPanel(
+                                                  verbatimTextOutput("prediction_logistic_model"),
+                                                  verbatimTextOutput("prediction_random_forest_model")
+                                                )
+                                                
+                                              )
                                               
                                               
                                               
                                               
                                               
                                               
-                                              
-                                              ))))
+        ))))
 
 )

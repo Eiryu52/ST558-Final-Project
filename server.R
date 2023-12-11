@@ -43,11 +43,15 @@ function(input, output, session) {
       
 
     })
+   
+  logistic_model <- reactiveVal(NULL)  
+  random_forest_model <- reactiveVal(NULL)
     
+  
     observeEvent(input$fit_models, {
       
       train_split <- input$split / 100
-      index <- createDataPartition(Heart_Data_Reduced$HadHeartAttack, p = 0.7, list = FALSE)
+      index <- createDataPartition(Heart_Data_Reduced$HadHeartAttack, p = train_split, list = FALSE)
       train_heart <- Heart_Data_Reduced[index,]
       test_heart <- Heart_Data_Reduced[-index,]
       
@@ -62,16 +66,68 @@ function(input, output, session) {
       Random_Forest <- train(as.formula(paste("HadHeartAttack ~ ", paste(input$predictors, collapse = "+"))), data = train_heart,
                              tuneGrid = grid, trControl = ctrl)
       
-      logistic_test_cm <- confusionMatrix(as.factor(predict(Logistic_Model, newdata = test_heart)), as.factor(test_heart$HadHeartAttack))
+      logistic_model(Logistic_Model)
+      random_forest_model(Random_Forest)
       
-      randomforest_test_cm <- confusionMatrix(as.factor(predict(Random_Forest, newdata = test_heart)), as.factor(test_heart$HadHeartAttack))
+      logistic_test_cm <- confusionMatrix(as.factor(predict(logistic_model(), newdata = test_heart)), as.factor(test_heart$HadHeartAttack))
+      
+      randomforest_test_cm <- confusionMatrix(as.factor(predict(random_forest_model(), newdata = test_heart)), as.factor(test_heart$HadHeartAttack))
       
       output$logistic_confusion_matrix <- renderPrint({logistic_test_cm})
       output$randomforest_confusion_matrix <- renderPrint({randomforest_test_cm})
+      
+      
     })
     
-                   
+    new_prediction_logistic <- reactive({
+      
+      predict_dataframe <- data.frame(
+        BMI = input$bmi_value,
+        WeightInKilograms = input$weight_value,
+        HeightInMeters = input$height_value,
+        HadStroke = input$stroke_value,
+        HadAngina = input$angina_value,
+        AlcoholDrinkers = input$alcohol_value,
+        Sex = input$sex_value,
+        PhysicalHealthDays = input$physicalhealthdays_value,
+        MentalHealthDays = input$mentalhealthdays_value,
+        SleepHours = input$sleephour_value
+      )
+      
+      heartdisease_prediction_logistic <- predict(logistic_model(), newdata = predict_dataframe)
+      heartdisease_prediction_logistic
+    })
+    
+    new_prediction_rf <- reactive({
+      
+      predict_dataframe <- data.frame(
+        BMI = input$bmi_value,
+        WeightInKilograms = input$weight_value,
+        HeightInMeters = input$height_value,
+        HadStroke = input$stroke_value,
+        HadAngina = input$angina_value,
+        AlcoholDrinkers = input$alcohol_value,
+        Sex = input$sex_value,
+        PhysicalHealthDays = input$physicalhealthdays_value,
+        MentalHealthDays = input$mentalhealthdays_value,
+        SleepHours = input$sleephour_value
+      )
+      
+      heartdisease_prediction_rf <- predict(random_forest_model(), newdata = predict_dataframe)
+      heartdisease_prediction_rf
+    })
+    
+    observeEvent(input$predict_results, {
+      
+      output$prediction_logistic_model <- renderPrint({new_prediction_logistic()})
+      output$prediction_random_forest_model <- renderPrint({new_prediction_rf()})
+      
+      
+    })
+    
   
 }
+
+
 
       
