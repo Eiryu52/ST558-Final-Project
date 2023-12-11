@@ -186,7 +186,8 @@ fluidPage(
         tabPanel("Prediction",
                  sidebarLayout(
                           sidebarPanel(
-                            
+                        
+                          h4("Make sure to change/input values of variables chosen in Model Fitting only"),
                           # Inputs for specific variables for this model
                           sliderInput("bmi_value", "BMI", value = 1, min = 1, max = 50),
                           sliderInput("weight_value", "Weight In Kilograms", value = 1, min = 1, max = 300),
