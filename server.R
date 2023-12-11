@@ -1,3 +1,12 @@
+#
+# Karthik Edupuganti
+# 12/11/2023
+# Server File for Shiny App
+#
+
+
+
+
 library(caret)
 library(tidyverse)
 library(randomForest)
@@ -7,10 +16,10 @@ library(shiny)
 
 function(input, output, session) {
 
-  Heart_Data <- read.csv("heart_2022_no_nans.csv", sep = ',')
-  Heart_Data_Reduced <- head(Heart_Data, 20000)
-  
-  
+  set.seed(620)
+  Heart_Data_Reduced <- read.csv("Heart_Data_Reduced.csv", sep = ',')
+
+  # Rendering plots using if/else logic based on input from UI.
   output$output_plot <- renderPlot({
     if (input$plot == 'Scatterplot') {
  
@@ -38,6 +47,7 @@ function(input, output, session) {
   
   })
   
+    # Rendering summaries for chosen numerical variable for levels of chosen categorical variable.
     output$summaryTable <- renderTable({
       Heart_Data_Reduced %>% select(input$variable_2, input$variable_1) %>% 
         group_by(!!sym(input$variable_2)) %>% 
@@ -47,46 +57,60 @@ function(input, output, session) {
 
     })
    
-    logistic_model <- reactiveVal(NULL)  
-    random_forest_model <- reactiveVal(NULL)
+    # Creating reactive value to store logistic model and random forest model
+    # Allows us to call the models that is built in the observeEvent function below later on.
+    Logistic_Model <- reactiveVal(NULL)  
+    Random_Forest_Model <- reactiveVal(NULL)
     
-  
+    
+    # Fitting model with the specific inputs from UI.
     observeEvent(input$fit_models, {
       
+      # Train/Test Splits
       train_split <- input$split / 100
       index <- createDataPartition(Heart_Data_Reduced$HadHeartAttack, p = train_split, list = FALSE)
       train_heart <- Heart_Data_Reduced[index,]
       test_heart <- Heart_Data_Reduced[-index,]
       
+      # Tuning parameters
       ctrl <- trainControl(method = "cv", number = as.numeric(input$validation))
       grid <- expand.grid(mtry = as.numeric(input$tuning))
       
-      
-      Logistic_Model <- train(as.formula(paste("HadHeartAttack ~ ", paste(input$predictors, collapse = "+"))), 
+      # Creating logistic model
+      model_logistic <- train(as.formula(paste("HadHeartAttack ~ ", paste(input$predictors, collapse = "+"))), 
                               data = train_heart, method = "glm", family = "binomial", 
                               trControl = ctrl)
       
-      Random_Forest <- train(as.formula(paste("HadHeartAttack ~ ", paste(input$predictors, collapse = "+"))), data = train_heart,
+      # Creating random forest model
+      model_rf <- train(as.formula(paste("HadHeartAttack ~ ", paste(input$predictors, collapse = "+"))), data = train_heart,
                              tuneGrid = grid, trControl = ctrl)
       
-      logistic_model(Logistic_Model)
-      random_forest_model(Random_Forest)
+      # Calling earlier reactiveVal functions to store models
+      Logistic_Model(model_logistic)
+      Random_Forest_Model(model_rf)
       
-      logistic_test_cm <- confusionMatrix(as.factor(predict(logistic_model(), newdata = test_heart)), as.factor(test_heart$HadHeartAttack))
+      #Creating confusion matrix for Logistic Model
+      logistic_test_cm <- confusionMatrix(as.factor(predict(Logistic_Model(), newdata = test_heart)), as.factor(test_heart$HadHeartAttack))
       
-      randomforest_test_cm <- confusionMatrix(as.factor(predict(random_forest_model(), newdata = test_heart)), as.factor(test_heart$HadHeartAttack))
+      #Creating confusion matrix for Random Forest Model
+      randomforest_test_cm <- confusionMatrix(as.factor(predict(Random_Forest_Model(), newdata = test_heart)), as.factor(test_heart$HadHeartAttack))
       
-      output$summaryLogistic <- renderPrint({summary(logistic_model())})
+      #Outputting summary for Logistic Model
+      output$summaryLogistic <- renderPrint({summary(Logistic_Model())})
       
-      output$variableimportanceRF <- renderPrint({varImp(random_forest_model())})
-      output$variableimportanceplotRF <- renderPlot({varImpPlot(random_forest_model()$finalModel, main = "Variance Importance Plot for Heart Disease")})
+      #Outputting information related to variable importance in Random Forest
+      output$variableimportanceRF <- renderPrint({varImp(Random_Forest_Model())})
+      output$variableimportanceplotRF <- renderPlot({varImpPlot(Random_Forest_Model()$finalModel, main = "Variance Importance Plot for Heart Disease")})
       
+      #Outputting confusion matrices to compare Logistic and Random Forest together.
       output$logistic_confusion_matrix <- renderPrint({logistic_test_cm})
       output$randomforest_confusion_matrix <- renderPrint({randomforest_test_cm})
       
       
     })
     
+    # Creating a reactive function to predict on Logistic Model
+    # Takes input from Prediction Tab UI and stores in a dataframe
     new_prediction_logistic <- reactive({
       
       predict_dataframe <- data.frame(
@@ -102,10 +126,13 @@ function(input, output, session) {
         SleepHours = input$sleephour_value
       )
       
-      heartdisease_prediction_logistic <- predict(logistic_model(), newdata = predict_dataframe)
+      # Creating a prediction using Logistic Model created from Model Fitting tab.
+      heartdisease_prediction_logistic <- predict(Logistic_Model(), newdata = predict_dataframe)
       heartdisease_prediction_logistic
     })
     
+    # Creating a reactive function to predict on Random Forest Model
+    # Takes input from Prediction Tab UI and stores in a dataframe
     new_prediction_rf <- reactive({
       
       predict_dataframe <- data.frame(
@@ -121,10 +148,12 @@ function(input, output, session) {
         SleepHours = input$sleephour_value
       )
       
-      heartdisease_prediction_rf <- predict(random_forest_model(), newdata = predict_dataframe)
+      # Creating a prediction using Random Forest Model created from Model Fitting tab.
+      heartdisease_prediction_rf <- predict(Random_Forest_Model(), newdata = predict_dataframe)
       heartdisease_prediction_rf
     })
     
+    # observeEvent function to show result of prediction based on changing parameters in prediction tab.
     observeEvent(input$predict_results, {
       
       output$prediction_logistic_model <- renderPrint({new_prediction_logistic()})

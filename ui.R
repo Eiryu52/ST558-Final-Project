@@ -1,10 +1,7 @@
 #
-# This is the user-interface definition of a Shiny web application. You can
-# run the application by clicking 'Run App' above.
-#
-# Find out more about building applications with Shiny here:
-#
-#    http://shiny.rstudio.com/
+# Karthik Edupuganti
+# 12/11/2023
+# UI File for Shiny App
 #
 
 library(shiny)
@@ -159,16 +156,20 @@ fluidPage(
                     
                     # Summary for Logistic Model
                     h4("Summary for Logistic Model on Train Set"),
+                    p("Viewing summary for logistic model can give insight on variables that are important in predicting Heart Disease.
+                      If the p-value for a variable is lower than the significance threshold of 0.05, it is significant in predicting Heart Disease."),
                     verbatimTextOutput("summaryLogistic"),
                     
                     # Variable Importance Table for Random Forest
                     h4("Variable Importance Table for Random Forest on Train Set"),
-                    p("The higher the number, the more important the variable is in contributing to predicting Heart Disease"),
+                    p("The higher the number in the 'Overall' column, the more important the variable is in contributing to predicting Heart Disease.
+                      Can cross-check with plot below to see if results of variable importance are the same."),
                     verbatimTextOutput("variableimportanceRF"),
                     
                     # Variable Importance Plot for Random Forest
                     h4("Visualizing Variable Importance for Random Forest on Train Set"),
-                    p("The higher the Mean Decrease in Gini, the more important the variable is in contributing to predicting Heart Disease"),
+                    p("The higher the Mean Decrease in Gini, the more important the variable is in contributing to predicting Heart Disease. Can
+                      cross-check with table above to see if results of variable importance are the same."),
                     plotOutput("variableimportanceplotRF"),
                     
                     # Confusion Matrix for Logistic Model
