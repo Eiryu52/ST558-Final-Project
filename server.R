@@ -13,8 +13,8 @@ function(input, output, session) {
   output$output_plot <- renderPlot({
     if (input$plot == 'Scatterplot') {
  
-      ggplot(Heart_Data_Reduced , aes_string(x = input$x_variable, y = input$y_variable)) +
-        geom_point(aes_string(col = input$categorical_variable))
+      ggplot(Heart_Data_Reduced , aes_string(x = input$scatter_x_var, y = input$scatter_y_var)) +
+        geom_point(aes_string(col = input$scatter_cat_var))
       
     } else if (input$plot == 'Histogram') {
    
@@ -23,13 +23,13 @@ function(input, output, session) {
       
     } else if (input$plot == 'Box Plot') {
       
-      ggplot(Heart_Data_Reduced , aes_string(x = input$categoric_variable, y = input$numeric_variable)) +
+      ggplot(Heart_Data_Reduced , aes_string(x = input$box_cat_var, y = input$box_num_var)) +
         geom_boxplot()
       
     } else if (input$plot == 'Bar Plot') {
       
       
-      ggplot(Heart_Data_Reduced, aes_string(x = input$category)) + geom_bar()
+      ggplot(Heart_Data_Reduced, aes_string(x = input$bar_cat_var, fill = input$bar_cat_var_2)) + geom_bar(position = "dodge")
       
     }
     
