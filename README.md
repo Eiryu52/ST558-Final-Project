@@ -12,7 +12,7 @@ List of packages:
 * shiny
 
 Code to install packages:
-install.packages(c("caret", "tidyverse", "randomForest", "shiny"))
+install.packages(c("caret", "tidyverse", "randomForest", "shiny", "shinythemes"))
 
 Code to run app:
 shiny::runGitHub(repo = "ST558-Final-Project", username = "Eiryu52", ref = "main")
