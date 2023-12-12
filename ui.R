@@ -43,7 +43,7 @@ fluidPage(
         and variables to fit for model out of some designated variables. Prediction Tab allows you to choose values of specific variables chosen in Model Fitting tab to predict
         Heart Disease or not."),
       
-      img(src = "heart.jpg")
+      img(src = "heart.png", height = "250px")
     )
     ),
     
