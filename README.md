@@ -10,6 +10,7 @@ List of packages:
 * tidyverse
 * randomForest
 * shiny
+* shinythemes
 
 Code to install packages:
 install.packages(c("caret", "tidyverse", "randomForest", "shiny", "shinythemes"))
