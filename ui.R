@@ -5,9 +5,11 @@
 #
 
 library(shiny)
+library(shinythemes)
 
 fluidPage(
-  
+  # Theme and title for app.
+  theme = shinytheme("united"),
   titlePanel("Heart Disease App for Data Exploration and Modeling"),
   
   # Start of creating necessary tabs for each project
